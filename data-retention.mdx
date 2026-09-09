@@ -8,23 +8,37 @@ icon: 'database'
 
 | Table | Retention |
 | :--- | :--- |
-| `markets` | **90 rolling days** - markets whose `close_time` falls inside the archive window are retained. Older rows are pruned. |
-| `snapshots` | **90 rolling days** - snapshots are pruned alongside markets older than 90 days. |
+| `markets` | **Up to 150 rolling days** - markets whose `close_time` falls inside the archive window are retained. Older rows are pruned. |
+| `snapshots` | **Up to 150 rolling days** - snapshots are pruned alongside markets older than 150 days. |
 
 The snapshot worker runs at ~100 ms cadence from open through close, so
 a typical 15-minute market produces ~9,000 snapshots. Plan your page
 sizes accordingly - the API caps `limit` at 1,000 snapshots per call.
 
 <Note>
-Retention is a full rolling 90-day archive. Your subscription still controls
-whether your API key can read 31, 60, or 90 days of that archive.
+Physical retention and API access are separate. New paid subscriptions can
+read up to 31, 60, or 120 days. Existing 90-day subscriptions continue to
+renew at their current price with 90-day access. You can upgrade to 120 days
+at your current or a higher request rate; the prorated upgrade takes effect
+after payment succeeds.
 </Note>
+
+<Warning>
+A history window is an access limit, not a guarantee that every expected
+market or snapshot exists. Deployments began collecting at different times.
+In the September 9, 2026 coverage audit, ETH had about 117.6 days of history;
+the other deployments had about 120.6 to 129 days. The audit also found
+collection gaps, including a multi-day June outage. Check returned timestamps
+and design backtests to detect missing markets, missing intervals, and nullable
+enrichment fields.
+</Warning>
 
 <Info>
 Plan access is separate from retention. Free accounts can access the newest 50
 markets in each `(coin × type)` deployment, subject to a 31-day cap. Shared
 paid configurations can access all markets inside their purchased 31-, 60-,
-or 90-day window.
+or 120-day window. Grandfathered 90-day subscriptions retain their existing
+window.
 
 An omitted `start_time` is clamped to the cutoff. An explicit timestamp,
 cursor, market `close_time`, or snapshot-at timestamp before the cutoff returns
