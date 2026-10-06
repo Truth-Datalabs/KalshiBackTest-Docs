@@ -17,8 +17,8 @@ sizes accordingly - the API caps `limit` at 1,000 snapshots per call.
 
 <Note>
 Physical retention and API access are separate. New paid subscriptions can
-read up to 31, 60, or 120 days. Existing 90-day subscriptions continue to
-renew at their current price with 90-day access. You can upgrade to 120 days
+read up to 31, 60, 120, or 150 days. Existing 90-day subscriptions continue to
+renew at their current price with 90-day access. You can upgrade to 120 or 150 days
 at your current or a higher request rate; the prorated upgrade takes effect
 after payment succeeds.
 </Note>
@@ -33,11 +33,19 @@ and design backtests to detect missing markets, missing intervals, and nullable
 enrichment fields.
 </Warning>
 
+<Warning>
+Some snapshots collected before August 25, 2026 contain frozen order books,
+near-zero phantom quantities, or crossed best bids. Collector fixes do not
+repair those historical rows. Treat affected intervals as unreliable; do not
+assume removing tiny quantities reconstructs missed updates. The 150-day
+option expands access to available records, not their completeness or quality.
+</Warning>
+
 <Info>
 Plan access is separate from retention. Free accounts can access the newest 50
 markets in each `(coin × type)` deployment, subject to a 31-day cap. Shared
-paid configurations can access all markets inside their purchased 31-, 60-,
-or 120-day window. Grandfathered 90-day subscriptions retain their existing
+paid configurations can access all markets inside their purchased 31-, 60-, 120-,
+or 150-day window. Grandfathered 90-day subscriptions retain their existing
 window.
 
 An omitted `start_time` is clamped to the cutoff. An explicit timestamp,
